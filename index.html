@@ -7,27 +7,44 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <img src="log_cac_redimens.png" alt="Logotipo do Conselho de Ação Comunitária da COHABI">
-        <nav class="menu-principal" aria-label="Menu principal">
-            <ul>
-                <li><a href="/">Início</a></li>
-                <li><a href="/institucional">Sobre nós</a></li>
-                <li><a href="/demandas">Demandas</a></li>
-                <li><a href="/projetos">Projetos</a></li>
-                <li><a href="/noticias">Notícias</a></li>
-            </ul>
-        </nav>
-        <input type="button" value="Entrar" onclick="Entrar()">
-    </header>
-    <main>
-  <section id="apresentacao">
+  <header class="header-container">
+    <div class="logo-container"><img src="log_cac_redimens.png" alt="Logo CAC COHABI" class="logo"></div>
+    <div class="user-access">
+      <form class="login-form">
+      <div class="input-group">
+        <label for="username">Nome ou cpf</label>
+        <input type="text" id="username" name="username">
+      </div>
+      <div class="input-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password">
+      </div>
+      <button type="submit" class="btn-entrar">Entrar</button>
+      </form>
+      <div class="signup-row">
+        <span>Não tem cadastro?</span>
+        <a href="cadastro.html" class="btn-cadastrar">Cadastrar-se</a>
+      </div>
+    </div>
+  </header>
+  <nav class="nav-bar" aria-label="Menu principal">
+    <ul class="menu-list">
+      <li><a href="/">Início</a></li>
+      <li><a href="/institucional">Sobre nós</a></li>
+      <li><a href="/demandas">Demandas</a></li>
+      <li><a href="/projetos">Projetos</a></li>
+      <li><a href="/noticias">Notícias</a></li>
+      </ul>
+  </nav>
+        <!--<input type="button" value="Entrar" onclick="Entrar()" id="ent">
+        <input type="button" value="Cadastre-se!" onclick="cadastrar()" id="cad">-->
+  <section class="hero-section">
     <h2>Bem-vindo ao nosso conselho</h2>
     <p>
       Um espaço de participação e diálogo
       para a comunidade.
     </p>
   </section>
-</main>
+  <script src="scriptinicial.js"></script>
 </body>
 </html>

@@ -4,77 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tela de cadastro</title>
+    <link rel="stylesheet" href="stylecadastro.css">
 </head>
 <body>
-    <p>Digite seu nome: <input type="text" id="nome"></p>
-    <p>Digite seu CPF: <input type="text" id="cpf" maxlength="14"></p>
-    <p>e-mail: <input type="text" id="email"></p>
-    <p>Ano de nascimento: <input type="number" id="ano"></p>
-    <p>
-        <input type="radio" name="radgen" id="masc">
-        <label for="masc">Masculino</label> 
-        <input type="radio" name="radgen" id="fem">
-        <label for="fem">Feminino</label>
-        <input type="radio" id="nd"></p>
-        <label for="nd">Prefiro não declarar</label>
-    <p>Senha <input type="password" id="senha"></p>
-    <p> Confirmar senha <input type="password" id="conf"></p>
-    <input type="button" value="Validar" onclick="Validar()">
-    <div id="res">Resultado</div>
-    <script>
-        function Validar() {
-        let nome = document.getElementById('nome').value.trim().toUpperCase().replace(/\s+/g, ' ')
-        let cpf = document.getElementById('cpf').value
-        let cpfNumeros = cpf.replace(/\D/g, '')
-        let email = document.getElementById('email')
-        let ano = document.getElementById('ano')
-        let gen = document.getElementsByName('radgen')
-        let resultado = document.querySelector('div#res')
-        if (nome===""){
-            alert('Por favor, digite seu nome!')
-            return;
-        }
-         if (cpfNumeros.length !== 11) {
-                alert("Por favor, digite um CPF válido com 11 números.")
-                return;
-         }
-          if (/^(\d)\1{10}$/.test(cpfNumeros)) {
-        return false;
-        }
-        let soma = 0;
+<div id="secao-formulario">
+    <h2>Cadastro do Morador</h2>
+    <div class="input-group">
+        <label for="nome">Nome Completo:</label>
+        <input type="text" id="nome">
+    </div>
+    <div class="input-group">
+        <label for="cpf">CPF:</label>
+        <input type="text" id="cpf" maxlength="14">
+    </div>
+    <div class="input-group">
+    <label for="email">E-mail:</label>
+    <input type="email" id="email">
+  </div>
+  <div class="input-group">
+    <label for="ano">Ano de Nascimento:</label>
+    <input type="number" id="ano">
+  </div>
+        <div class="input-group">
+            <label for="genero">Gênero:</label>
+            <input type="radio" name="radgen" id="masc" value="Masculino">
+            <label for="masc">Masculino</label>
+            <input type="radio" name="radgen" id="fem" value="Feminino">
+            <label for="fem">Feminino</label>
+            <input type="radio" name="radgen" id="nd" value="nao_declarado">
+            <label for="nd">Prefiro não declarar</label>
+        </div>
+        <div class="input-group">
+          <label for="senha">Senha (6 caracteres):</label>
+          <div class="password-wrapper">
+        <input type="password" id="senha" maxlength="6">
+        <button type="button" class="toggle-password" onclick="alternarVisibilidade('senha', this)">👁️</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="confirmaSenha">Confirme a Senha:</label>
+        <div class="password-wrapper">
+        <input type="password" id="confirmaSenha" maxlength="6">
+        <button type="button" class="toggle-password" onclick="alternarVisibilidade('confirmaSenha', this)">👁️</button>
+        </div>
+    </div>
+    <button type="button" onclick="Validar()">Validar Dados</button>
+</div>
 
-    for (let i = 0; i < 9; i++) {
-        soma += Number(cpfNumeros[i]) * (10 - i);
-    }
+<!-- TELA 2: CONFIRMAÇÃO DE DADOS (Inicia oculta) -->
+<div id="secao-confirmacao" style="display: none;">
+  <h2>Confirme seus Dados</h2>
+  <div id="resumo-dados"></div>
 
-    let resto = soma % 11;
-    let digito1 = resto < 2 ? 0 : 11 - resto;
-      if (digito1 !== Number(cpfNumeros[9])) {
-        return false;
-    }
-     soma = 0;
+  <div class="botoes-confirmacao">
+    <button type="button" onclick="corrigirCadastro()">Refazer Cadastro</button>
+    <button type="button" onclick="confirmarCadastroFinal()">Confirmar Cadastro</button>
+  </div>
+</div>
 
-    for (let i = 0; i < 10; i++) {
-        soma += Number(cpfNumeros[i]) * (11 - i);
-    }
-
-    resto = soma % 11;
-    let digito2 = resto < 2 ? 0 : 11 - resto;
-     if (digito2 !== Number(cpfNumeros[10])) {
-        return false;
-    }
-
-    return true;
-}
-          cpfNumeros = cpfNumeros.replace(
-                /^(\d{3})(\d{3})(\d{3})(\d{2})$/,'$1.$2.$3-$4')
-            document.getElementById('cpf').value = cpfNumeros
-            resultado.innerHTML=`Olá ${nome}! Seu CPF é ${cpfNumeros}.`
-        }
-        /*if (nome===0){
-            window.alert('ERRO. Verifique os dados')*/
-
-    </script>
+    <script src="scriptcadastro.js"></script>
     
 </body>
 </html>
