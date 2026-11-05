@@ -1,4 +1,7 @@
- let nomeUsuarioGeral="";
+let listaUsuariosGeral = JSON.parse(localStorage.getItem("usuarios")) || []; 
+let dadosUsuarioTemporario = null;
+let nomeUsuarioGeral = "";
+
  function Validar() {
   // Captura dos elementos e valores
   let campoNome = document.getElementById('nome');
@@ -96,6 +99,18 @@
   // Oculta o formulário e exibe a tela de revisão
   document.getElementById('secao-formulario').style.display = 'none';
   document.getElementById('secao-confirmacao').style.display = 'block';
+   // NOVA ADIÇÃO: Guardamos todos os dados organizados em um objeto temporário
+    dadosUsuarioTemporario = {
+    nome: nome,
+    cpf: cpfFormatado,
+    email: email,
+    anoNascimento: anoNascimento,
+    genero: generoSelecionado,
+    senha: senha // Em um sistema real, senhas nunca são salvas em texto limpo, mas para o aprendizado atual serve perfeitamente!
+    };
+
+  // Guarda o nome para usar na mensagem final (seu código original)
+    nomeUsuarioGeral = nome;
 }
 // Botão "Refazer Cadastro": Limpa o formulário e volta à tela inicial de cadastro
 function corrigirCadastro() {
@@ -120,8 +135,35 @@ function corrigirCadastro() {
   document.getElementById('nome').focus();
 }
 
-// Botão "Confirmar Cadastro": Exibe o alert final e redireciona
+/*// Botão "Confirmar Cadastro": Exibe o alert final e redireciona
 function confirmarCadastroFinal() {
+  alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
+  window.location.href = "index.html";
+  // Botão "Confirmar Cadastro": Salva na lista, exibe o alert e redireciona
+function confirmarCadastroFinal() {
+  
+  // SE SEGURANÇA: Verifica se existem dados temporários antes de salvar
+  if (dadosUsuarioTemporario !== null) {
+    // Adiciona o novo usuário na lista sem apagar os anteriores!
+    listaUsuariosGeral.push(dadosUsuarioTemporario);
+    // Limpa a variável temporária para o próximo cadastro
+    dadosUsuarioTemporario = null;
+  }
+
+  alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
+  window.location.href = "index.html";
+}
+}*/
+function confirmarCadastroFinal() {
+  if (dadosUsuarioTemporario !== null) {
+    listaUsuariosGeral.push(dadosUsuarioTemporario);
+    
+    // Transforma a lista em texto e salva no LocalStorage
+    localStorage.setItem("usuarios", JSON.stringify(listaUsuariosGeral));
+    
+    dadosUsuarioTemporario = null;
+  }
+
   alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
   window.location.href = "index.html";
 }
