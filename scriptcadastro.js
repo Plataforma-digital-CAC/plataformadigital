@@ -1,9 +1,28 @@
-let listaUsuariosGeral = JSON.parse(localStorage.getItem("usuarios")) || []; 
+// Configuração de acesso ao Supabase para a tela de cadastro
+const SUPABASE_URL = "https://joggbpbkiywfecptykzy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_-uwJJwgF-mY-QxYgUFNmWA_-cqCYXgw";
+
+// Cria a conexão oficial
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/*let listaUsuariosGeral = JSON.parse(localStorage.getItem("usuarios")) || [];*/ 
 let dadosUsuarioTemporario = null;
 let nomeUsuarioGeral = "";
 
- function Validar() {
-  // Captura dos elementos e valores
+// 1. Escuta o clique do botão Validar Dados
+function Validar() {
+  console.log("Botão Validar foi clicado com sucesso!");
+  
+  const formulario = document.getElementById('formularioCadastro');
+  if (!formulario) {
+    alert("Erro crítico: O JavaScript não encontrou o formulário no HTML. Verifique o ID!");
+    return;
+  }
+
+  if (!formulario.reportValidity()) {
+    return;
+  }
+
   let campoNome = document.getElementById('nome');
   let campoCpf = document.getElementById('cpf');
   let campoEmail = document.getElementById('email');
@@ -18,46 +37,45 @@ let nomeUsuarioGeral = "";
   let anoNascimento = Number(campoAno.value);
   let senha = campoSenha.value;
   let confirmaSenha = campoConfirmaSenha.value;
-  // 1. Validação do Nome
+
+  // Validações
   if (nome === "") {
     alert('Por favor, digite seu nome!');
-    campoNome.value="";
+    campoNome.value = "";
     campoNome.focus();
     return;
   }
-  campoNome.value = nome; // Devolve o nome formatado para o campo
+  campoNome.value = nome;
 
-  // 2. Validação do CPF
   if (!validarCPF(cpfNumeros)) {
     alert("Por favor, digite um CPF válido!");
-    campoCpf.value="";
+    campoCpf.value = "";
     campoCpf.focus();
     return;
   }
   let cpfFormatado = cpfNumeros.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
   campoCpf.value = cpfFormatado;
-  // 3. Validação do E-mail
+
   let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!regexEmail.test(email)) {
     alert('Por favor, digite um e-mail válido!');
-    campoEmail.value="";
+    campoEmail.value = "";
     campoEmail.focus();
     return;
   }
 
-  // 4. Validação do Ano de Nascimento
   let anoAtual = new Date().getFullYear();
   if (campoAno.value.length === 0 || anoNascimento < 1900 || anoNascimento > anoAtual) {
     alert(`Por favor, digite um ano de nascimento válido (entre 1900 e ${anoAtual})!`);
-    campoAno.value="";
+    campoAno.value = "";
     campoAno.focus();
     return;
   }
-  // 5. Validação do Gênero
+
   let generoSelecionado = "";
   for (let i = 0; i < radiosGenero.length; i++) {
     if (radiosGenero[i].checked) {
-      generoSelecionado = radiosGenero[i].value; // Certifique-se de que cada radio no HTML tem o atributo value
+      generoSelecionado = radiosGenero[i].value;
       break;
     }
   }
@@ -65,56 +83,50 @@ let nomeUsuarioGeral = "";
     alert('Por favor, selecione seu gênero!');
     return;
   }
-  // 6. Validação do Tamanho da Senha (deve ter exatamente 6 caracteres)
-  if (senha.length !== 6) {
-    alert('A senha deve conter exatamente 6 caracteres!');
-    campoSenha.value="";
+
+  if (senha.length < 8 || senha.length > 72) {
+    alert('A senha deve conter entre 8 e 72 caracteres!');
+    campoSenha.value = "";
     campoConfirmaSenha.value = "";
     campoSenha.focus();
     return;
   }
-  // 7. Validação da Confirmação de Senha
+
   if (senha !== confirmaSenha) {
     alert('As senhas digitadas não coincidem. Por favor, tente novamente!');
-    campoSenha.value="";
-    campoConfirmaSenha.value="";
+    campoSenha.value = "";
+    campoConfirmaSenha.value = "";
     campoConfirmaSenha.focus();
     return;
   }
 
-  // Guarda o nome para usar na mensagem final
   nomeUsuarioGeral = nome;
-
-   // Prepara e Exibe a Tela de Confirmação
   let idade = anoAtual - anoNascimento;
+
   document.getElementById('resumo-dados').innerHTML = `
     <p><strong>Nome:</strong> ${nome}</p>
     <p><strong>CPF:</strong> ${cpfFormatado}</p>
     <p><strong>E-mail:</strong> ${email}</p>
     <p><strong>Idade:</strong> ${idade} anos (${anoNascimento})</p>
     <p><strong>Gênero:</strong> ${generoSelecionado}</p>
-    <p><strong>Senha:</strong> ****** (6 dígitos)</p>
+    <p><strong>Senha:</strong> ******</p>
   `;
 
-  // Oculta o formulário e exibe a tela de revisão
   document.getElementById('secao-formulario').style.display = 'none';
   document.getElementById('secao-confirmacao').style.display = 'block';
-   // NOVA ADIÇÃO: Guardamos todos os dados organizados em um objeto temporário
-    dadosUsuarioTemporario = {
+
+  dadosUsuarioTemporario = {
     nome: nome,
     cpf: cpfFormatado,
     email: email,
     anoNascimento: anoNascimento,
     genero: generoSelecionado,
-    senha: senha // Em um sistema real, senhas nunca são salvas em texto limpo, mas para o aprendizado atual serve perfeitamente!
-    };
+    senha: senha
+  };
+}; // <-- Fechamento correto do botão validar!
 
-  // Guarda o nome para usar na mensagem final (seu código original)
-    nomeUsuarioGeral = nome;
-}
-// Botão "Refazer Cadastro": Limpa o formulário e volta à tela inicial de cadastro
+// 2. Função para o botão "Refazer Cadastro"
 function corrigirCadastro() {
-  // Limpa todos os campos
   document.getElementById('nome').value = "";
   document.getElementById('cpf').value = "";
   document.getElementById('email').value = "";
@@ -122,59 +134,51 @@ function corrigirCadastro() {
   document.getElementById('senha').value = "";
   document.getElementById('confirmaSenha').value = "";
 
-  // Desmarca os botões de gênero
   let radiosGenero = document.getElementsByName('radgen');
   for (let i = 0; i < radiosGenero.length; i++) {
     radiosGenero[i].checked = false;
   }
-// Alterna as telas de volta para o formulário limpo
+
   document.getElementById('secao-confirmacao').style.display = 'none';
   document.getElementById('secao-formulario').style.display = 'block';
-  
-  // Coloca o cursor no primeiro campo
   document.getElementById('nome').focus();
 }
 
-/*// Botão "Confirmar Cadastro": Exibe o alert final e redireciona
-function confirmarCadastroFinal() {
-  alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
-  window.location.href = "index.html";
-  // Botão "Confirmar Cadastro": Salva na lista, exibe o alert e redireciona
-function confirmarCadastroFinal() {
-  
-  // SE SEGURANÇA: Verifica se existem dados temporários antes de salvar
-  if (dadosUsuarioTemporario !== null) {
-    // Adiciona o novo usuário na lista sem apagar os anteriores!
-    listaUsuariosGeral.push(dadosUsuarioTemporario);
-    // Limpa a variável temporária para o próximo cadastro
-    dadosUsuarioTemporario = null;
+// 3. Função assíncrona para salvar no Supabase
+async function confirmarCadastroFinal() {
+  if (dadosUsuarioTemporario === null) {
+    alert("Nenhum dado encontrado para cadastrar.");
+    return;
   }
 
-  alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
-  window.location.href = "index.html";
-}
-}*/
-function confirmarCadastroFinal() {
-  if (dadosUsuarioTemporario !== null) {
-    listaUsuariosGeral.push(dadosUsuarioTemporario);
-    
-    // Transforma a lista em texto e salva no LocalStorage
-    localStorage.setItem("usuarios", JSON.stringify(listaUsuariosGeral));
-    
-    dadosUsuarioTemporario = null;
-  }
+  const { data, error } = await supabase.auth.signUp({
+    email: dadosUsuarioTemporario.email,
+    password: dadosUsuarioTemporario.senha,
+    options: {
+      data: {
+        nome_completo: dadosUsuarioTemporario.nome,
+        cpf: dadosUsuarioTemporario.cpf,
+        ano_nascimento: dadosUsuarioTemporario.anoNascimento,
+        genero: dadosUsuarioTemporario.genero
+      }
+    }
+  });
 
-  alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
-  window.location.href = "index.html";
+  if (error) {
+    alert(`Erro ao realizar cadastro: ${error.message}`);
+    console.error("Erro detalhado:", error);
+  } else {
+    alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
+    dadosUsuarioTemporario = null;
+    window.location.href = "index.html";
+  }
 }
  
-// Função para validar o cálculo real do CPF
+// 4. Função auxiliar para validar o cálculo do CPF
 function validarCPF(cpf) {
   if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
     return false;
   }
-
-  // Cálculo do 1º Dígito Verificador
   let soma = 0;
   for (let i = 0; i < 9; i++) {
     soma += parseInt(cpf.charAt(i)) * (10 - i);
@@ -182,7 +186,7 @@ function validarCPF(cpf) {
   let resto = (soma * 10) % 11;
   if (resto === 10 || resto === 11) resto = 0;
   if (resto !== parseInt(cpf.charAt(9))) return false;
-  // Cálculo do 2º Dígito Verificador
+
   soma = 0;
   for (let i = 0; i < 10; i++) {
     soma += parseInt(cpf.charAt(i)) * (11 - i);
@@ -192,14 +196,15 @@ function validarCPF(cpf) {
   if (resto !== parseInt(cpf.charAt(10))) return false;
   return true;
 }
+
+// 5. Função para o botão do Olho
 function alternarVisibilidade(idCampo, botao) {
   let campo = document.getElementById(idCampo);
-
   if (campo.type === "password") {
     campo.type = "text";
-    botao.textContent = "🙈"; // Altera o ícone quando a senha está visível
+    botao.textContent = "🙈";
   } else {
     campo.type = "password";
-    botao.textContent = "👁️"; // Volta ao ícone padrão quando a senha está oculta
+    botao.textContent = "👁️";
   }
 }

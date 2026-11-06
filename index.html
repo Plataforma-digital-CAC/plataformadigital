@@ -12,12 +12,12 @@
     <div class="user-access">
       <form class="login-form">
       <div class="input-group">
-        <label for="username">Nome ou cpf</label>
-        <input type="text" id="username" name="username">
+        <label for="username">e-mail</label>
+        <input type="text" id="username" name="username" autocomplete="username" required>
       </div>
       <div class="input-group">
         <label for="password">Senha</label>
-        <input type="password" id="password" name="password">
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
       </div>
       <button type="submit" class="btn-entrar">Entrar</button>
       </form>
@@ -29,22 +29,23 @@
   </header>
   <nav class="nav-bar" aria-label="Menu principal">
     <ul class="menu-list">
-      <li><a href="/">Início</a></li>
-      <li><a href="/institucional">Sobre nós</a></li>
-      <li><a href="/demandas">Demandas</a></li>
-      <li><a href="/projetos">Projetos</a></li>
-      <li><a href="/noticias">Notícias</a></li>
+      <li><a href="inicio.html">Início</a></li>
+      <li><a href="institucional.html">Sobre nós</a></li>
+      <li><a href="demandas.html">Demandas</a></li>
+      <li><a href="projetos.html">Projetos</a></li>
+      <li><a href="noticias.html">Notícias</a></li>
       </ul>
   </nav>
-        <!--<input type="button" value="Entrar" onclick="Entrar()" id="ent">
-        <input type="button" value="Cadastre-se!" onclick="cadastrar()" id="cad">-->
-  <section class="hero-section">
-    <h2>Bem-vindo ao nosso conselho</h2>
-    <p>
-      Um espaço de participação e diálogo
-      para a comunidade.
-    </p>
-  </section>
-  <script src="scriptinicial.js"></script>
+  <main>
+    <section class="hero-section">
+      <h1>Bem-vindo ao nosso conselho</h1>
+      <p>
+        Um espaço de participação e diálogo
+        para a comunidade.
+      </p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="scriptinicial.js" defer></script>
 </body>
 </html>
