@@ -1,11 +1,10 @@
 // Configuração de acesso ao Supabase para a tela de cadastro
-const SUPABASE_URL = "https://supabase.co";
+const SUPABASE_URL = "https://joggbpbkiywfecptykzy.supabase.co";
 const SUPABASE_KEY = "sb_publishable_-uwJJwgF-mY-QxYgUFNmWA_-cqCYXgw";
 
 // Cria a conexão oficial
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let listaUsuariosGeral = JSON.parse(localStorage.getItem("usuarios")) || []; 
 let dadosUsuarioTemporario = null;
 let nomeUsuarioGeral = "";
 
