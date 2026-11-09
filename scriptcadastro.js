@@ -1,16 +1,16 @@
 // Configuração de acesso ao Supabase para a tela de cadastro
-const SUPABASE_URL = "https://joggbpbkiywfecptykzy.supabase.co";
+const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "sb_publishable_-uwJJwgF-mY-QxYgUFNmWA_-cqCYXgw";
 
 // Cria a conexão oficial
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/*let listaUsuariosGeral = JSON.parse(localStorage.getItem("usuarios")) || [];*/ 
+let listaUsuariosGeral = JSON.parse(localStorage.getItem("usuarios")) || []; 
 let dadosUsuarioTemporario = null;
 let nomeUsuarioGeral = "";
 
-// 1. Escuta o clique do botão Validar Dados
-function Validar() {
+// LIGAÇÃO DIRETA: Controla o clique do botão pelo ID do HTML
+document.getElementById('btnValidar').addEventListener('click', () => {
   console.log("Botão Validar foi clicado com sucesso!");
   
   const formulario = document.getElementById('formularioCadastro');
@@ -38,7 +38,7 @@ function Validar() {
   let senha = campoSenha.value;
   let confirmaSenha = campoConfirmaSenha.value;
 
-  // Validações
+  // 1. Validação do Nome
   if (nome === "") {
     alert('Por favor, digite seu nome!');
     campoNome.value = "";
@@ -47,6 +47,7 @@ function Validar() {
   }
   campoNome.value = nome;
 
+  // 2. Validação do CPF
   if (!validarCPF(cpfNumeros)) {
     alert("Por favor, digite um CPF válido!");
     campoCpf.value = "";
@@ -56,6 +57,7 @@ function Validar() {
   let cpfFormatado = cpfNumeros.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
   campoCpf.value = cpfFormatado;
 
+  // 3. Validação do E-mail
   let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!regexEmail.test(email)) {
     alert('Por favor, digite um e-mail válido!');
@@ -64,6 +66,7 @@ function Validar() {
     return;
   }
 
+  // 4. Validação do Ano de Nascimento
   let anoAtual = new Date().getFullYear();
   if (campoAno.value.length === 0 || anoNascimento < 1900 || anoNascimento > anoAtual) {
     alert(`Por favor, digite um ano de nascimento válido (entre 1900 e ${anoAtual})!`);
@@ -72,6 +75,7 @@ function Validar() {
     return;
   }
 
+  // 5. Validação do Gênero
   let generoSelecionado = "";
   for (let i = 0; i < radiosGenero.length; i++) {
     if (radiosGenero[i].checked) {
@@ -84,6 +88,7 @@ function Validar() {
     return;
   }
 
+  // 6. Validação do Tamanho da Senha
   if (senha.length < 8 || senha.length > 72) {
     alert('A senha deve conter entre 8 e 72 caracteres!');
     campoSenha.value = "";
@@ -92,6 +97,7 @@ function Validar() {
     return;
   }
 
+  // 7. Validação da Confirmação de Senha
   if (senha !== confirmaSenha) {
     alert('As senhas digitadas não coincidem. Por favor, tente novamente!');
     campoSenha.value = "";
@@ -103,6 +109,7 @@ function Validar() {
   nomeUsuarioGeral = nome;
   let idade = anoAtual - anoNascimento;
 
+  // Prepara e Exibe a Tela de Confirmação
   document.getElementById('resumo-dados').innerHTML = `
     <p><strong>Nome:</strong> ${nome}</p>
     <p><strong>CPF:</strong> ${cpfFormatado}</p>
@@ -112,9 +119,11 @@ function Validar() {
     <p><strong>Senha:</strong> ******</p>
   `;
 
+  // Oculta o formulário e exibe a tela de revisão
   document.getElementById('secao-formulario').style.display = 'none';
   document.getElementById('secao-confirmacao').style.display = 'block';
 
+  // Guarda os dados organizados no objeto temporário
   dadosUsuarioTemporario = {
     nome: nome,
     cpf: cpfFormatado,
@@ -123,10 +132,10 @@ function Validar() {
     genero: generoSelecionado,
     senha: senha
   };
-}; // <-- Fechamento correto do botão validar!
+});
 
-// 2. Função para o botão "Refazer Cadastro"
-function corrigirCadastro() {
+// Botão "Refazer Cadastro"
+window.corrigirCadastro = function() {
   document.getElementById('nome').value = "";
   document.getElementById('cpf').value = "";
   document.getElementById('email').value = "";
@@ -144,14 +153,15 @@ function corrigirCadastro() {
   document.getElementById('nome').focus();
 }
 
-// 3. Função assíncrona para salvar no Supabase
-async function confirmarCadastroFinal() {
+// Botão "Confirmar Cadastro Final" no Supabase
+window.confirmarCadastroFinal = function() {
   if (dadosUsuarioTemporario === null) {
     alert("Nenhum dado encontrado para cadastrar.");
     return;
   }
 
-  const { data, error } = await supabase.auth.signUp({
+  // Usamos a janela de confirmação de forma assíncrona com Promises do próprio Supabase
+  supabase.auth.signUp({
     email: dadosUsuarioTemporario.email,
     password: dadosUsuarioTemporario.senha,
     options: {
@@ -162,19 +172,19 @@ async function confirmarCadastroFinal() {
         genero: dadosUsuarioTemporario.genero
       }
     }
+  }).then(({ data, error }) => {
+    if (error) {
+      alert(`Erro ao realizar cadastro: ${error.message}`);
+      console.error("Erro detalhado:", error);
+    } else {
+      alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
+      dadosUsuarioTemporario = null;
+      window.location.href = "index.html";
+    }
   });
-
-  if (error) {
-    alert(`Erro ao realizar cadastro: ${error.message}`);
-    console.error("Erro detalhado:", error);
-  } else {
-    alert(`Cadastro de ${nomeUsuarioGeral} realizado com sucesso! Você será redirecionado para a tela de login.`);
-    dadosUsuarioTemporario = null;
-    window.location.href = "index.html";
-  }
 }
  
-// 4. Função auxiliar para validar o cálculo do CPF
+// Função auxiliar do CPF
 function validarCPF(cpf) {
   if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
     return false;
@@ -197,8 +207,8 @@ function validarCPF(cpf) {
   return true;
 }
 
-// 5. Função para o botão do Olho
-function alternarVisibilidade(idCampo, botao) {
+// Função para o botão do Olho (Disponibilizada globalmente)
+window.alternarVisibilidade = function(idCampo, botao) {
   let campo = document.getElementById(idCampo);
   if (campo.type === "password") {
     campo.type = "text";
